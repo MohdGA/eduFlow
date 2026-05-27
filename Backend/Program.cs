@@ -138,13 +138,29 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // ── Pipeline ────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Apply pending migrations on startup + seed initial content.
-using (var scope = app.Services.CreateScope())
+// Seed the database AFTER the host has started so we bind the HTTP port
+// immediately — important on hosts (Render free) that scan for an open
+// port before the seed finishes. The seeder is idempotent: if Users already
+// exist it returns immediately.
+app.Lifetime.ApplicationStarted.Register(() =>
 {
-    var db   = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var lf   = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-    await EduFlow.Infrastructure.Data.DbSeeder.SeedAsync(db, lf.CreateLogger("EduFlow.Seed"));
-}
+    _ = Task.Run(async () =>
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var lf = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+            await EduFlow.Infrastructure.Data.DbSeeder.SeedAsync(db, lf.CreateLogger("EduFlow.Seed"));
+        }
+        catch (Exception ex)
+        {
+            app.Services.GetRequiredService<ILoggerFactory>()
+               .CreateLogger("EduFlow.Seed")
+               .LogError(ex, "Background seed failed");
+        }
+    });
+});
 
 app.UseForwardedHeaders();
 app.UseGlobalExceptionHandler();
