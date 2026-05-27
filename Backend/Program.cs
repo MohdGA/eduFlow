@@ -138,10 +138,18 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 // ── Pipeline ────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Seed the database AFTER the host has started so we bind the HTTP port
-// immediately — important on hosts (Render free) that scan for an open
-// port before the seed finishes. The seeder is idempotent: if Users already
-// exist it returns immediately.
+// Create the DB schema synchronously BEFORE binding the port. Otherwise the
+// platform's health check (e.g. Render hitting /api/Courses) can fire while
+// the Courses table is still being created in the background → 500 errors →
+// deploy marked unhealthy. Schema creation is fast (~ms) and idempotent.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.EnsureCreatedAsync();
+}
+
+// Data seeding (users, audit rows) runs AFTER the host starts so we don't
+// delay port binding. Idempotent: if users already exist, returns early.
 app.Lifetime.ApplicationStarted.Register(() =>
 {
     _ = Task.Run(async () =>
