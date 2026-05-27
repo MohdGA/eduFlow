@@ -13,7 +13,7 @@ services:
     region: oregon              # change to frankfurt / singapore / etc. if you prefer
     plan: starter               # $7/mo — needed for persistent disk
     dockerfilePath: ./Backend/Dockerfile
-    dockerContext: ./Backend
+    dockerContext: .
     autoDeploy: true            # redeploy on every push to main
 
     healthCheckPath: /api/Courses

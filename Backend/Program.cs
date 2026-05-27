@@ -10,6 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Railway / Fly / Heroku-style hosts inject a $PORT env var that the app must
+// listen on. Honour it if present; otherwise fall back to ASPNETCORE_URLS or 5180.
+var portEnv = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(portEnv))
+    builder.WebHost.UseUrls($"http://+:{portEnv}");
+
 // Allow large video uploads (up to 500 MB).
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 500L * 1024 * 1024);
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
