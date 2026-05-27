@@ -21,9 +21,11 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Default port — Render / Railway / Fly inject $PORT and Program.cs honours
-# it, binding explicitly on 0.0.0.0 for IPv4 compatibility.
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+# it, binding explicitly on 0.0.0.0 for IPv4 compatibility. Render's default
+# expected port for web services is 10000 — we EXPOSE it explicitly so
+# Render's port scanner can identify the right port immediately.
+ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 ENV ASPNETCORE_ENVIRONMENT=Production
-EXPOSE 8080
+EXPOSE 10000
 
 ENTRYPOINT ["dotnet", "EduFlow.Backend.dll"]
