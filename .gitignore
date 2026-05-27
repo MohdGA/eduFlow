@@ -1,0 +1,38 @@
+# ── .NET ──
+**/bin/
+**/obj/
+**/publish/
+**/.vs/
+**/*.user
+**/*.suo
+
+# ── Angular / Node ──
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+
+# ── Editors ──
+.vscode/
+.idea/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Runtime data (do NOT commit user uploads or local DB) ──
+Backend/eduflow.db
+Backend/eduflow.db-shm
+Backend/eduflow.db-wal
+Backend/wwwroot/media/
+
+# ── Secrets ──
+# Real OAuth secrets and JWT key live in appsettings.Development.json (local)
+# or env vars on Render (production). Never commit the Development file.
+Backend/appsettings.Development.json
+*.pem
+.env
+.env.local
+
+# ── Logs ──
+*.log

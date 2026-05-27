@@ -1,0 +1,16 @@
+**/bin
+**/obj
+**/publish
+**/.vs
+**/.idea
+**/.vscode
+**/*.user
+**/*.suo
+**/.git
+**/.gitignore
+**/eduflow.db
+**/eduflow.db-shm
+**/eduflow.db-wal
+wwwroot/media
+appsettings.Development.json
+README.md

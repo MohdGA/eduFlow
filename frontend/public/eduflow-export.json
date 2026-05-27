@@ -1,0 +1,17 @@
+{
+  "exportedAt": "2026-05-24T22:08:35.588Z",
+  "note": "This is a metadata-only export for the preview build. Production would stream a full DB dump from the backend.",
+  "settings": {
+    "siteName": "EduFlow",
+    "supportEmail": "support@eduflow.com",
+    "publicSignup": true,
+    "maintenance": false,
+    "adminMfa": false,
+    "sessionMins": 40,
+    "rateLimit": 120,
+    "smtpHost": "",
+    "smtpPort": 587,
+    "smtpFrom": "",
+    "savedAt": "5/25/2026, 1:05:06 AM"
+  }
+}

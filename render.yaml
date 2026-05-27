@@ -1,0 +1,69 @@
+# Render Blueprint — defines the EduFlow backend service on Render.
+# After committing this file & pushing to GitHub, go to:
+#   https://dashboard.render.com  →  New  →  Blueprint  →  point at the repo
+# Render will create the web service and persistent disk automatically.
+#
+# Secrets (JWT key, OAuth client IDs/secrets, etc.) are NOT in this file.
+# Set them per-service in the Render dashboard → Environment.
+
+services:
+  - type: web
+    name: eduflow-api
+    runtime: docker
+    region: oregon              # change to frankfurt / singapore / etc. if you prefer
+    plan: starter               # $7/mo — needed for persistent disk
+    dockerfilePath: ./Backend/Dockerfile
+    dockerContext: ./Backend
+    autoDeploy: true            # redeploy on every push to main
+
+    healthCheckPath: /api/Courses
+
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+
+      # ── Database (SQLite file on the persistent disk) ──
+      - key: ConnectionStrings__Default
+        value: Data Source=/data/eduflow.db
+
+      # ── Uploaded media (videos, course thumbnails) on the persistent disk ──
+      - key: Storage__MediaRoot
+        value: /data/media
+
+      # ── JWT signing key — generate a 32+ byte random string and paste it
+      #    in the Render dashboard. NEVER commit the real value. ──
+      - key: Jwt__Key
+        sync: false
+      - key: Jwt__Issuer
+        value: EduFlow
+      - key: Jwt__Audience
+        value: EduFlowClient
+      - key: Jwt__AccessTokenMinutes
+        value: "60"
+
+      # ── CORS — allow only the deployed frontend origin ──
+      # Set this in the dashboard to your Vercel URL once it's deployed:
+      #   https://eduflow-<hash>.vercel.app
+      - key: Cors__AllowedOrigins__0
+        sync: false
+
+      # ── OAuth — set real values in the Render dashboard (sync: false) ──
+      - key: OAuth__FrontendUrl
+        sync: false                # e.g. https://eduflow-<hash>.vercel.app
+      - key: OAuth__RedirectPath
+        value: /oauth/callback
+      - key: OAuth__Google__ClientId
+        sync: false
+      - key: OAuth__Google__ClientSecret
+        sync: false
+      - key: OAuth__GitHub__ClientId
+        sync: false
+      - key: OAuth__GitHub__ClientSecret
+        sync: false
+
+    disk:
+      name: eduflow-data
+      mountPath: /data
+      sizeGB: 5                  # bumps to ~$1/mo extra; expand later as needed
