@@ -1,0 +1,49 @@
+# Fly.io app config for EduFlow backend.
+#
+# Setup (one time):
+#   1. Install flyctl:
+#        Windows PowerShell:   iwr https://fly.io/install.ps1 -useb | iex
+#        macOS / Linux:        curl -L https://fly.io/install.sh | sh
+#   2. fly auth signup          (or `fly auth login` if you already have an account)
+#   3. fly launch --no-deploy   (uses this file; will prompt for app name + region)
+#   4. fly secrets set ...      (see the env vars below)
+#   5. fly deploy
+#
+# Listening: the Dockerfile exposes 8080 and Program.cs honours $PORT.
+
+app = "eduflow-api"               # change to your chosen app name from `fly launch`
+primary_region = "fra"            # frankfurt; switch to ams / iad / sin / etc.
+
+[build]
+  dockerfile = "Backend/Dockerfile"
+
+[env]
+  ASPNETCORE_ENVIRONMENT = "Production"
+  ASPNETCORE_URLS = "http://+:8080"
+  Jwt__Issuer = "EduFlow"
+  Jwt__Audience = "EduFlowClient"
+  Jwt__AccessTokenMinutes = "60"
+  OAuth__RedirectPath = "/oauth/callback"
+  # Secrets (Jwt__Key, OAuth client IDs / secrets, Cors__AllowedOrigins__0,
+  # OAuth__FrontendUrl) are NOT here — set them with `fly secrets set`.
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"      # save free-tier resources when idle
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout  = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path   = "/api/Courses"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"                 # Free allowance covers shared-cpu-1x with 256mb; 512mb fits 1 vm comfortably
+  cpu_kind = "shared"
+  cpus = 1
