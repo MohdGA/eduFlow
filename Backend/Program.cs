@@ -153,13 +153,16 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Data seeding (users, audit rows) runs AFTER the host starts so we don't
-// delay port binding. Idempotent: if users already exist, returns early.
+// delay port binding. Brief delay lets the platform's first few health-check
+// probes hit a CPU-idle container before BCrypt work begins. Idempotent: if
+// users already exist, returns early.
 app.Lifetime.ApplicationStarted.Register(() =>
 {
     _ = Task.Run(async () =>
     {
         try
         {
+            await Task.Delay(TimeSpan.FromSeconds(5));
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var lf = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();

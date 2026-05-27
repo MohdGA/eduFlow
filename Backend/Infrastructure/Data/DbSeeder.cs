@@ -87,7 +87,11 @@ public static class DbSeeder
         {
             FirstName = first, LastName = last,
             Email = email.ToLowerInvariant(),
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(pw, 12),
+            // Low work-factor for seeded demo users only — keeps startup fast on
+            // free-tier CPUs (work-factor 12 took up to 5s per hash, saturating
+            // the 0.1 vCPU and starving Render's health-check thread). Real
+            // user registrations via AuthService still use BCryptWorkFactor=12.
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(pw, 4),
             Role = role,
             Title = title, Bio = bio,
             AvatarSeed = first[..1],
