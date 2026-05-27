@@ -11,7 +11,7 @@ services:
     name: eduflow-api
     runtime: docker
     region: oregon              # change to frankfurt / singapore / etc. if you prefer
-    plan: starter               # $7/mo — needed for persistent disk
+    plan: free                  # $0 — no persistent disk, sleeps after 15 min idle
     dockerfilePath: ./Backend/Dockerfile
     dockerContext: .
     autoDeploy: true            # redeploy on every push to main
@@ -24,13 +24,12 @@ services:
       - key: ASPNETCORE_URLS
         value: http://+:8080
 
-      # ── Database (SQLite file on the persistent disk) ──
+      # ── Database (SQLite file inside the container — ephemeral on free plan) ──
       - key: ConnectionStrings__Default
-        value: Data Source=/data/eduflow.db
+        value: Data Source=eduflow.db
 
-      # ── Uploaded media (videos, course thumbnails) on the persistent disk ──
-      - key: Storage__MediaRoot
-        value: /data/media
+      # ── Uploaded media (ephemeral on free plan, served from wwwroot/media) ──
+      # Don't set Storage__MediaRoot here — Program.cs defaults to wwwroot/media.
 
       # ── JWT signing key — generate a 32+ byte random string and paste it
       #    in the Render dashboard. NEVER commit the real value. ──
@@ -63,7 +62,12 @@ services:
       - key: OAuth__GitHub__ClientSecret
         sync: false
 
-    disk:
-      name: eduflow-data
-      mountPath: /data
-      sizeGB: 5                  # bumps to ~$1/mo extra; expand later as needed
+    # No persistent disk on the free plan. The SQLite DB lives inside the
+    # container's writable layer and is reset on every redeploy. Uploaded
+    # videos / thumbnails are also ephemeral. Upgrade to plan: starter and
+    # uncomment the block below for persistent storage.
+    #
+    # disk:
+    #   name: eduflow-data
+    #   mountPath: /data
+    #   sizeGB: 5
