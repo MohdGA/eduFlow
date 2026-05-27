@@ -20,7 +20,11 @@
     (e.g. https://eduflow-api.onrender.com). The Angular bundle reads it
     via core/config/api.config.ts.
   -->
-  <script>window.__EDUFLOW_API__ = 'http://localhost:5180';</script>
+  <script>
+    // Backend API URL — points at the deployed Render service in production.
+    // For local dev, change to 'http://localhost:5180' while running both servers locally.
+    window.__EDUFLOW_API__ = 'https://eduflow-api-d7xb.onrender.com';
+  </script>
 </head>
 <body>
   <app-root></app-root>
