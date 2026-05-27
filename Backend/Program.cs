@@ -10,11 +10,15 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Railway / Fly / Heroku-style hosts inject a $PORT env var that the app must
-// listen on. Honour it if present; otherwise fall back to ASPNETCORE_URLS or 5180.
+// Render / Railway / Fly / Heroku-style hosts inject a $PORT env var that the
+// app must listen on. Honour it if present; otherwise fall back to
+// ASPNETCORE_URLS or 5180. Bind on 0.0.0.0 (IPv4 all-interfaces) explicitly —
+// "+" or "::" can resolve to IPv6-only on some container runtimes, which
+// makes Render's internal IPv4 health-check probe fail with "connection
+// refused" and the deploy times out even though the app is running.
 var portEnv = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrWhiteSpace(portEnv))
-    builder.WebHost.UseUrls($"http://+:{portEnv}");
+    builder.WebHost.UseUrls($"http://0.0.0.0:{portEnv}");
 
 // Allow large video uploads (up to 500 MB).
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 500L * 1024 * 1024);

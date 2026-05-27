@@ -20,8 +20,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Default port — Railway / Fly inject $PORT and Program.cs honours it.
-ENV ASPNETCORE_URLS=http://+:8080
+# Default port — Render / Railway / Fly inject $PORT and Program.cs honours
+# it, binding explicitly on 0.0.0.0 for IPv4 compatibility.
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 
