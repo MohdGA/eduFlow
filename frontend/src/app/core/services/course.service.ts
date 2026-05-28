@@ -96,6 +96,10 @@ export class CourseService {
     return this.http.patch<CourseSummary>(`${API_BASE_URL}/Courses/${id}/publish`, {});
   }
 
+  listMy(): Observable<CourseSummary[]> {
+    return this.http.get<CourseSummary[]>(`${API_BASE_URL}/Courses/my`);
+  }
+
   /** Upload a thumbnail image for a course. Image goes to /media/courses/<id>.<ext>. */
   uploadThumbnail(courseId: string, file: File): Observable<CourseSummary> {
     const fd = new FormData();

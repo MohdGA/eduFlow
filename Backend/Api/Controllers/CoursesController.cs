@@ -56,6 +56,35 @@ public sealed class CoursesController(AppDbContext db) : ControllerBase
         return Ok(items);
     }
 
+    /// <summary>List courses owned by the authenticated instructor (including drafts).</summary>
+    [HttpGet("my")]
+    [Authorize(Roles = "Instructor,Admin")]
+    [ProducesResponseType(typeof(IEnumerable<CourseSummaryDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> MyCourses(CancellationToken ct)
+    {
+        var userId = GetUserId();
+        if (userId is null) return Unauthorized();
+
+        var items = await db.Courses
+            .AsNoTracking()
+            .Include(c => c.Instructor)
+            .Include(c => c.Sections).ThenInclude(s => s.Lessons)
+            .Where(c => c.InstructorId == userId.Value)
+            .OrderByDescending(c => c.CreatedAt)
+            .Select(c => new CourseSummaryDto(
+                c.Id, c.Title, c.Subtitle, c.Category, c.Level.ToString(),
+                c.Price,
+                c.Instructor != null ? c.Instructor.FirstName + " " + c.Instructor.LastName : "Unknown",
+                c.Instructor != null ? (c.Instructor.AvatarSeed ?? c.Instructor.FirstName.Substring(0, 1)) : "?",
+                c.Sections.SelectMany(s => s.Lessons).Count(),
+                c.Duration, c.Rating, c.ReviewCount, c.StudentCount,
+                c.IsBestseller, c.IsNew, c.ThumbnailGradient,
+                c.IsPublished, c.ImageUrl))
+            .ToListAsync(ct);
+
+        return Ok(items);
+    }
+
     /// <summary>Get full course detail including sections and lessons.
     /// Public for published courses; the owning instructor or any admin can also view drafts.</summary>
     [HttpGet("{id:guid}")]

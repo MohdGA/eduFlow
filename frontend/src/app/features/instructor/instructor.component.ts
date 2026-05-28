@@ -126,7 +126,11 @@ import { AnalyticsDialogComponent } from '../../shared/analytics-dialog.componen
             </div>
             <div style="flex:1"><strong>\${{ (c.studentCount * c.price * 0.7) | number:'1.0-0' }}</strong></div>
             <div style="flex:1">
-              <span class="lms-badge green">Published</span>
+              @if (c.isPublished) {
+                <span class="lms-badge green">Published</span>
+              } @else {
+                <span class="lms-badge" style="background:var(--lms-surface-3);color:var(--lms-text-2)">Draft</span>
+              }
             </div>
             <div style="flex:0.5; display:flex; gap:4px; justify-content:flex-end;">
               <a class="row-btn" [routerLink]="['/course', c.id]" matTooltip="View public page"><mat-icon>visibility</mat-icon></a>
@@ -341,7 +345,7 @@ export class InstructorComponent implements OnInit {
   ngOnInit(): void { this.refresh(); }
 
   private refresh(): void {
-    this.api.list({ pageSize: 100 }).subscribe({
+    this.api.listMy().subscribe({
       next: list => { this.myCourses.set(list); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
