@@ -134,8 +134,7 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
     .auth-page {
       min-height: 100vh;
       background: radial-gradient(circle at top right, #1A0E2E 0%, var(--lms-bg) 60%);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center;
       padding: 32px; box-sizing: border-box; overflow-x: hidden;
     }
     .blob {
@@ -147,6 +146,7 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
     /* ── Card ── */
     .auth-grid {
       position: relative; z-index: 1;
+      margin: auto 0;
       width: 100%; max-width: 1080px;
       display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
       background: rgba(17,17,32,0.6); backdrop-filter: blur(20px);
