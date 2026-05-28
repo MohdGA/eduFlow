@@ -137,6 +137,9 @@ builder.Services.AddRateLimiter(opts =>
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Trust all upstream proxies (Render / Railway / Fly manage the network layer).
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
 // ── Pipeline ────────────────────────────────────────────────────────────────
