@@ -232,12 +232,27 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
     .hero {
       position:relative; border-radius:var(--lms-radius);
       background: linear-gradient(135deg, #15152A 0%, #0D0D1A 100%);
-      border: 1px solid var(--lms-border);
+      border: 1px solid rgba(124,58,237,0.25);
       padding: 56px 56px; margin: 32px 0 16px;
       overflow: hidden; min-height:440px;
       display:flex; align-items:center;
       perspective: 1500px;
       transform-style: preserve-3d;
+      box-shadow: 0 0 60px rgba(124,58,237,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+      &::before {
+        content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+        background-image:
+          linear-gradient(rgba(124,58,237,0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+      }
+      &::after {
+        content:''; position:absolute; top:0; left:-100%; width:40%; height:1px;
+        background: linear-gradient(90deg, transparent, rgba(124,58,237,0.6), rgba(59,130,246,0.4), transparent);
+        animation: shine 4s ease-in-out infinite;
+        z-index:0;
+      }
     }
     .hero-3d-stage {
       position:absolute; top:0; right:0; bottom:0;
@@ -259,19 +274,36 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
     .btn-primary {
       display:inline-flex; align-items:center; gap:8px;
       padding:13px 30px; border-radius:var(--lms-radius-sm);
-      background:var(--lms-gradient); color:#fff; font-weight:700; font-size:14px;
-      text-decoration:none; box-shadow:var(--lms-shadow-purple);
-      transition:opacity .2s, transform .15s;
+      background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);
+      background-size: 200% 200%;
+      color:#fff; font-weight:700; font-size:14px;
+      text-decoration:none; box-shadow: 0 8px 32px rgba(124,58,237,0.45);
+      transition: transform .2s, box-shadow .2s, background-position .4s;
+      position: relative; overflow: hidden;
       mat-icon { font-size:18px; width:18px; height:18px; }
-      &:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 12px 40px rgba(124,58,237,0.5); }
+      &::after {
+        content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left .5s ease;
+      }
+      &:hover {
+        transform:translateY(-3px);
+        box-shadow: 0 16px 48px rgba(124,58,237,0.6), 0 0 0 1px rgba(124,58,237,0.4);
+        &::after { left: 150%; }
+      }
     }
     .btn-ghost {
       display:inline-flex; align-items:center;
       padding:13px 26px; border-radius:var(--lms-radius-sm);
       border:1px solid var(--lms-border); color:var(--lms-text-2);
       font-size:14px; font-weight:600; text-decoration:none;
-      transition:all .15s;
-      &:hover { border-color:var(--lms-border-hover); color:var(--lms-text); }
+      transition:all .2s; position:relative; overflow:hidden;
+      &::before {
+        content:''; position:absolute; inset:0;
+        background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(59,130,246,0.08));
+        opacity:0; transition:opacity .2s;
+      }
+      &:hover { border-color:var(--lms-purple); color:var(--lms-text); &::before { opacity:1; } }
     }
 
     /* ── Parallax 3D shapes ── */
@@ -410,7 +442,17 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
        ═══════════════════════════════════════════════════ */
     .section { margin-bottom:44px; }
     .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-    .section-title  { font-size:22px; font-weight:800; margin:0; letter-spacing:-.4px; }
+    .section-title  {
+      font-size:22px; font-weight:800; margin:0; letter-spacing:-.4px;
+      position: relative; display: inline-block;
+      &::after {
+        content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px;
+        background: linear-gradient(90deg, var(--lms-purple), var(--lms-blue));
+        border-radius:99px;
+        transition: width .4s cubic-bezier(.16,1,.3,1);
+      }
+      &:hover::after { width:100%; }
+    }
     .see-all {
       display:flex; align-items:center; gap:4px; font-size:13px; font-weight:600;
       color:var(--lms-purple-2); text-decoration:none; transition:gap .15s;
@@ -475,10 +517,14 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
       background:var(--lms-surface); border:1px solid var(--lms-border);
       border-radius:var(--lms-radius); padding:20px; overflow:hidden;
       transform-style:preserve-3d;
-      transition: border-color .2s, box-shadow .2s;
+      transition: border-color .2s, box-shadow .25s, transform .25s cubic-bezier(.16,1,.3,1);
       --tilt-glare-x: 50%; --tilt-glare-y: 50%; --tilt-glare-opacity: 0;
       will-change: transform;
-      &:hover { border-color:var(--lms-purple); }
+      &:hover {
+        border-color:var(--lms-purple);
+        box-shadow: 0 16px 48px rgba(124,58,237,0.2), 0 0 0 1px rgba(124,58,237,0.2);
+        transform: translateY(-4px);
+      }
     }
     .kpi-glare {
       position:absolute; inset:0; pointer-events:none; border-radius:inherit;
@@ -513,13 +559,18 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
     /* ═══════════════════════════════════════════════════
        Achievement medal — 3D rotating coin
        ═══════════════════════════════════════════════════ */
+    @keyframes achieveGlow {
+      0%,100% { box-shadow: 0 0 30px rgba(245,158,11,0.08), 0 0 0 1px rgba(245,158,11,0.12); }
+      50%     { box-shadow: 0 0 50px rgba(245,158,11,0.18), 0 0 0 1px rgba(245,158,11,0.25); }
+    }
     .achievement-row {
       display:grid; grid-template-columns:280px 1fr; gap:48px;
       padding:40px; margin-bottom:44px;
       background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(124,58,237,0.06));
-      border:1px solid var(--lms-border);
+      border:1px solid rgba(245,158,11,0.2);
       border-radius: var(--lms-radius);
       position: relative; overflow:hidden;
+      animation: achieveGlow 4s ease-in-out infinite;
     }
     .medal-stage {
       position:relative; height:200px;
@@ -597,8 +648,18 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
       text-decoration:none; overflow:hidden; transform-style:preserve-3d;
       --tilt-glare-x: 50%; --tilt-glare-y: 50%; --tilt-glare-opacity: 0;
       will-change: transform;
-      transition: border-color .2s, box-shadow .25s;
-      &:hover { border-color: var(--lms-purple); box-shadow: 0 25px 60px rgba(124,58,237,0.25); }
+      transition: border-color .2s, box-shadow .25s, transform .3s cubic-bezier(.16,1,.3,1);
+      &::after {
+        content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+        background: linear-gradient(135deg, rgba(124,58,237,0) 0%, rgba(124,58,237,0.06) 100%);
+        opacity:0; transition:opacity .3s;
+      }
+      &:hover {
+        border-color: var(--lms-purple);
+        box-shadow: 0 25px 60px rgba(124,58,237,0.3), 0 0 0 1px rgba(124,58,237,0.25), 0 0 30px rgba(59,130,246,0.1);
+        transform: translateY(-6px);
+        &::after { opacity:1; }
+      }
     }
     .course-thumb {
       height:150px; position:relative;

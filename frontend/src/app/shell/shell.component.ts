@@ -182,6 +182,11 @@ import { AuthService } from '../core/services/auth.service';
     .shell { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
 
     /* ── Topnav ── */
+    @keyframes navBorderFlow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .topnav {
       height: var(--lms-topnav-h);
       background: rgba(10,10,20,0.85);
@@ -189,6 +194,14 @@ import { AuthService } from '../core/services/auth.service';
       border-bottom: 1px solid var(--lms-border);
       position: sticky; top:0; z-index:100;
       flex-shrink: 0;
+      overflow: visible;
+      &::after {
+        content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(59,130,246,0.4), rgba(236,72,153,0.3), transparent);
+        background-size: 200% 100%;
+        animation: navBorderFlow 5s linear infinite;
+        opacity: 0.7;
+      }
     }
     .nav-inner {
       max-width: 1300px; margin:0 auto;
@@ -205,9 +218,15 @@ import { AuthService } from '../core/services/auth.service';
     .brand-icon {
       width:36px; height:36px; border-radius:10px;
       background: var(--lms-gradient);
+      background-size: 200% 200%;
       display:flex; align-items:center; justify-content:center;
       box-shadow: var(--lms-shadow-purple);
+      animation: navBorderFlow 4s ease infinite;
+      transition: box-shadow .25s;
       mat-icon { color:#fff; font-size:20px; width:20px; height:20px; }
+    }
+    .brand:hover .brand-icon {
+      box-shadow: 0 0 24px rgba(124,58,237,0.6), 0 0 48px rgba(59,130,246,0.2);
     }
     .brand-name { font-size:18px; font-weight:800; color:var(--lms-text); letter-spacing:-.4px; }
 
@@ -225,6 +244,7 @@ import { AuthService } from '../core/services/auth.service';
         color:var(--lms-text);
         background: var(--lms-purple-dim);
         font-weight:700;
+        box-shadow: 0 0 14px rgba(124,58,237,0.15), inset 0 0 0 1px rgba(124,58,237,0.2);
         mat-icon { color:var(--lms-purple-2); }
       }
     }
