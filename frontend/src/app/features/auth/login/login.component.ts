@@ -130,9 +130,10 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
   `,
   styles: [`
     .auth-page {
-      position:relative; min-height:100vh; overflow-x:hidden; overflow-y:auto;
+      position:fixed; inset:0; overflow-y:auto; overflow-x:hidden;
       background: radial-gradient(circle at top right, #1A0E2E 0%, var(--lms-bg) 60%);
       display:flex; align-items:center; justify-content:center; padding:32px;
+      box-sizing:border-box;
     }
     .blob {
       &.b1 { width:520px; height:520px; background:rgba(124,58,237,0.18); top:-150px; left:-100px; animation:floatBlob 16s ease-in-out infinite; }
@@ -273,13 +274,15 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
       .auth-right { display:none; }
     }
     @media (max-width: 600px) {
-      .auth-page { padding:16px; align-items:flex-start; padding-top:24px; }
-      .auth-grid { padding:28px 20px; border-radius:16px; }
-      .auth-title { font-size:24px; }
-      .brand-link { margin-bottom:20px; }
-      .auth-sub { margin-bottom:16px; }
-      .form-row { flex-direction:column; align-items:flex-start; gap:8px; }
-      .oauth-row { grid-template-columns:1fr; }
+      .auth-page { padding: 16px; align-items: flex-start; padding-top: 24px; }
+      .auth-grid { padding: 24px 16px; border-radius: 16px; }
+      .auth-title { font-size: 22px; }
+      .auth-sub { font-size: 13px; margin-bottom: 14px; }
+      .brand-link { margin-bottom: 18px; }
+      .field input { font-size: 16px; }
+      .form-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .oauth-row { grid-template-columns: 1fr; }
+      .submit-btn { padding: 14px; font-size: 15px; }
     }
   `]
 })
