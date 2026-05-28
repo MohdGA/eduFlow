@@ -148,7 +148,7 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
   `,
   styles: [`
     .auth-page {
-      position:relative; min-height:100vh; overflow:hidden;
+      position:relative; min-height:100vh; overflow-x:hidden; overflow-y:auto;
       background: radial-gradient(circle at bottom left, #1A0E2E 0%, var(--lms-bg) 60%);
       display:flex; align-items:center; justify-content:center; padding:32px;
     }

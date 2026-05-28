@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NgApexchartsModule } from 'ng-apexcharts';
-import { MY_COURSES, COURSES } from '../../core/models/mock-data';
+import { MY_COURSES } from '../../core/models/mock-data';
 import { CourseService } from '../../core/services/course.service';
 import { resolveMediaUrl } from '../../core/config/api.config';
 import { EnrollmentService } from '../../core/services/enrollment.service';
@@ -176,48 +176,6 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
             </div>
           }
         </div>
-      </div>
-    </section>
-
-    <!-- ── Recommended ── -->
-    <section class="section" appScrollReveal>
-      <div class="section-header">
-        <h2 class="section-title">Recommended for You</h2>
-        <a routerLink="/catalog" class="see-all">See all <mat-icon>arrow_forward</mat-icon></a>
-      </div>
-      <div class="course-grid">
-        @for (c of featured(); track c.id) {
-          <a class="course-card tilt-card" [routerLink]="['/course', c.id]" appTilt3d [maxTilt]="10" [translateZ]="18" [glare]="0.2">
-            <div class="cc-glare"></div>
-            <div class="course-thumb" [class]="c.thumbnail">
-              @if (c.imageUrl) {
-                <img [src]="c.imageUrl" [alt]="c.title" loading="lazy" class="thumb-img">
-              }
-              @if (c.isBestseller) { <span class="thumb-badge amber">Bestseller</span> }
-              @if (c.isNew) { <span class="thumb-badge green">New</span> }
-            </div>
-            <div class="course-body">
-              <div class="course-top">
-                <span class="lms-badge" [class]="catColor(c.category)">{{ c.category }}</span>
-                <span class="lms-badge" [class]="levelBadge(c.level)">{{ c.level }}</span>
-              </div>
-              <h3 class="course-title">{{ c.title }}</h3>
-              <p class="course-sub">{{ c.subtitle }}</p>
-              <div class="course-meta">
-                <span class="stars">{{ starStr(c.rating) }}</span>
-                <span class="meta-val">{{ c.rating }}</span>
-                <span class="meta-muted">({{ c.reviewCount | number }})</span>
-              </div>
-              <div class="course-footer">
-                <div class="instructor-row">
-                  <div class="instr-av">{{ c.instructorAvatar }}</div>
-                  <span class="instr-name">{{ c.instructor }}</span>
-                </div>
-                <span class="course-price">\${{ c.price }}</span>
-              </div>
-            </div>
-          </a>
-        }
       </div>
     </section>
 
@@ -736,29 +694,9 @@ export class HomeComponent implements OnInit {
   private enrollApi = inject(EnrollmentService);
   private auth = inject(AuthService);
 
-  // Initialized from mock data; replaced with real API data in ngOnInit.
-  myCourses = signal<Course[]>(MY_COURSES);
-  featured  = signal<Course[]>(COURSES.slice(0, 4));
+  myCourses = signal<Course[]>([]);
 
   ngOnInit(): void {
-    // ── Featured (top 4 published courses from the backend) ──
-    this.courseApi.list({ pageSize: 4 }).subscribe({
-      next: cs => {
-        const mapped: Course[] = cs.slice(0, 4).map(c => ({
-          id: c.id, title: c.title, subtitle: c.subtitle,
-          instructor: c.instructorName, instructorAvatar: c.instructorAvatar || '?',
-          thumbnail: c.thumbnailGradient || 'grad-purple',
-          imageUrl: resolveMediaUrl(c.imageUrl),
-          category: c.category, level: c.level,
-          rating: c.rating, reviewCount: c.reviewCount, studentCount: c.studentCount,
-          duration: c.duration, lessonCount: c.lessonCount, price: c.price,
-          isBestseller: c.isBestseller, isNew: c.isNew, tags: [],
-        }));
-        if (mapped.length > 0) this.featured.set(mapped);
-      },
-      error: () => { /* keep mock fallback */ },
-    });
-
     // ── Continue Learning (user's real enrollments) — only if logged in ──
     if (!this.auth.isLoggedIn()) return;
     this.enrollApi.myEnrollments().subscribe({
