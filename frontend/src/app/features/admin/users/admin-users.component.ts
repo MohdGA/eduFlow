@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AdminService, AdminUser } from '../../../core/services/admin.service';
+import { AdminService, AdminUser, CreateUserPayload } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -30,8 +30,58 @@ import { AuthService } from '../../../core/services/auth.service';
           <option value="Instructor">Instructor</option>
           <option value="Admin">Admin</option>
         </select>
+        <button class="create-btn" (click)="showForm.set(!showForm())">
+          <mat-icon>{{ showForm() ? 'close' : 'person_add' }}</mat-icon>
+          {{ showForm() ? 'Cancel' : 'Add Instructor' }}
+        </button>
       </div>
     </div>
+
+    @if (showForm()) {
+      <div class="create-form afu">
+        <h3 class="cf-title"><mat-icon>person_add</mat-icon> New Instructor Account</h3>
+        <div class="cf-grid">
+          <div class="cf-field">
+            <label>First Name *</label>
+            <input [(ngModel)]="form.firstName" placeholder="e.g. Sarah" maxlength="40">
+          </div>
+          <div class="cf-field">
+            <label>Last Name *</label>
+            <input [(ngModel)]="form.lastName" placeholder="e.g. Chen" maxlength="40">
+          </div>
+          <div class="cf-field">
+            <label>Email *</label>
+            <input [(ngModel)]="form.email" type="email" placeholder="instructor@example.com" maxlength="120">
+          </div>
+          <div class="cf-field">
+            <label>Password *</label>
+            <input [(ngModel)]="form.password" type="password" placeholder="Min 8 characters" maxlength="100">
+          </div>
+          <div class="cf-field cf-span2">
+            <label>Title <span class="opt">(optional)</span></label>
+            <input [(ngModel)]="form.title" placeholder="e.g. Senior Software Engineer & Educator" maxlength="140">
+          </div>
+          <div class="cf-field cf-span2">
+            <label>Bio <span class="opt">(optional)</span></label>
+            <textarea [(ngModel)]="form.bio" placeholder="A short instructor bio…" maxlength="1200" rows="3"></textarea>
+          </div>
+          <div class="cf-field">
+            <label>Role</label>
+            <select [(ngModel)]="form.role">
+              <option value="Instructor">Instructor</option>
+              <option value="Student">Student</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="cf-foot">
+          <button class="create-btn" (click)="submitCreate()" [disabled]="creating()">
+            <mat-icon>{{ creating() ? 'hourglass_empty' : 'check' }}</mat-icon>
+            {{ creating() ? 'Creating…' : 'Create Account' }}
+          </button>
+        </div>
+      </div>
+    }
 
     @if (loading()) {
       <p class="muted">Loading users…</p>
@@ -157,6 +207,48 @@ import { AuthService } from '../../../core/services/auth.service';
       &.inactive { color: var(--lms-text-muted); }
     }
 
+    .create-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border: none; border-radius: var(--lms-radius-sm);
+      background: var(--lms-gradient); color: #fff;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      box-shadow: var(--lms-shadow-purple); white-space: nowrap;
+      transition: opacity .15s, transform .15s;
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      &:hover { opacity: .9; transform: translateY(-1px); }
+      &:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    }
+
+    .create-form {
+      background: var(--lms-surface); border: 1px solid var(--lms-border);
+      border-radius: var(--lms-radius); padding: 24px; margin-bottom: 24px;
+    }
+    .cf-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 15px; font-weight: 800; margin: 0 0 20px;
+      mat-icon { color: var(--lms-purple-2); font-size: 18px; width: 18px; height: 18px; }
+    }
+    .cf-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .cf-field {
+      display: flex; flex-direction: column; gap: 6px;
+      label { font-size: 12px; font-weight: 700; color: var(--lms-text-2); text-transform: uppercase; letter-spacing: .4px; }
+      .opt { font-weight: 400; text-transform: none; color: var(--lms-text-muted); }
+      input, textarea, select {
+        background: var(--lms-surface-2); border: 1px solid var(--lms-border);
+        border-radius: var(--lms-radius-sm); padding: 9px 12px;
+        color: var(--lms-text); font-size: 13px; outline: none;
+        transition: border-color .15s;
+        &:focus { border-color: var(--lms-purple); }
+        &::placeholder { color: var(--lms-text-muted); }
+      }
+      textarea { resize: vertical; font-family: inherit; }
+      select { cursor: pointer; }
+    }
+    .cf-span2 { grid-column: span 2; }
+    .cf-foot { margin-top: 18px; display: flex; justify-content: flex-end; }
+
     .btn {
       width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--lms-border);
       background: var(--lms-surface-2); color: var(--lms-text-2);
@@ -180,6 +272,41 @@ export class AdminUsersComponent implements OnInit {
   loading    = signal(true);
   search     = '';
   roleFilter = '';
+
+  showForm = signal(false);
+  creating = signal(false);
+  form: CreateUserPayload = this.blankForm();
+
+  private blankForm(): CreateUserPayload {
+    return { firstName: '', lastName: '', email: '', password: '', role: 'Instructor', title: '', bio: '' };
+  }
+
+  submitCreate(): void {
+    const { firstName, lastName, email, password } = this.form;
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+      this.snack.open('First name, last name, email and password are required.', 'OK', { duration: 3000, panelClass: 'snack-err' });
+      return;
+    }
+    if (password.length < 8) {
+      this.snack.open('Password must be at least 8 characters.', 'OK', { duration: 3000, panelClass: 'snack-err' });
+      return;
+    }
+    this.creating.set(true);
+    this.api.createUser(this.form).subscribe({
+      next: user => {
+        this.snack.open(`${user.firstName} ${user.lastName} created as ${user.role}`, 'OK', { duration: 3000, panelClass: 'snack-ok' });
+        this.users.update(list => [user, ...list]);
+        this.form = this.blankForm();
+        this.showForm.set(false);
+        this.creating.set(false);
+      },
+      error: (e: { error?: { message?: string }; status?: number }) => {
+        const msg = e?.error?.message ?? (e?.status === 409 ? 'Email already in use.' : 'Failed to create user.');
+        this.snack.open(msg, 'OK', { duration: 4000, panelClass: 'snack-err' });
+        this.creating.set(false);
+      },
+    });
+  }
 
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 

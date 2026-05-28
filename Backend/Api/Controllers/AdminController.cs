@@ -67,6 +67,45 @@ public sealed class AdminController(AppDbContext db, ILogger<AdminController> lo
         return Ok(users);
     }
 
+    [HttpPost("users")]
+    [ProducesResponseType(typeof(AdminUserDto), 201)]
+    [ProducesResponseType(typeof(ApiError), 409)]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest req, CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new ApiError("INVALID_REQUEST", "Invalid user payload."));
+
+        var email = req.Email.Trim().ToLowerInvariant();
+        if (await db.Users.AnyAsync(u => u.Email == email, ct))
+            return Conflict(new ApiError("EMAIL_TAKEN", "A user with this email already exists."));
+
+        var user = new User
+        {
+            FirstName    = req.FirstName.Trim(),
+            LastName     = req.LastName.Trim(),
+            Email        = email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password, 10),
+            Role         = req.Role,
+            Title        = string.IsNullOrWhiteSpace(req.Title) ? null : req.Title.Trim(),
+            Bio          = string.IsNullOrWhiteSpace(req.Bio)   ? null : req.Bio.Trim(),
+        };
+        db.Users.Add(user);
+        db.AuditLogs.Add(new AuditLog
+        {
+            UserId    = GetUserId(),
+            Action    = "USER_CREATE",
+            Resource  = "User",
+            Detail    = $"Admin created {user.Role} account for {user.Email}",
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+        });
+        await db.SaveChangesAsync(ct);
+        log.LogInformation("Admin created {Role} {UserId}", user.Role, user.Id);
+
+        var dto = new AdminUserDto(user.Id, user.FirstName, user.LastName, user.Email,
+                                   user.Role.ToString(), user.IsActive, user.CreatedAt, null);
+        return StatusCode(201, dto);
+    }
+
     [HttpPatch("users/{id:guid}/role")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]

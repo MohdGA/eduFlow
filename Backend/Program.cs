@@ -153,6 +153,19 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.EnsureCreatedAsync();
+
+    // EnsureCreatedAsync only runs on first creation — it never alters an existing DB.
+    // Run idempotent CREATE TABLE IF NOT EXISTS for any table added after initial deploy.
+    await db.Database.ExecuteSqlRawAsync("""
+        CREATE TABLE IF NOT EXISTS "PasswordResetTokens" (
+            "Id"        TEXT NOT NULL PRIMARY KEY,
+            "UserId"    TEXT NOT NULL,
+            "TokenHash" TEXT NOT NULL UNIQUE,
+            "ExpiresAt" TEXT NOT NULL,
+            "UsedAt"    TEXT NULL,
+            FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+        )
+    """);
 }
 
 // Data seeding (users, audit rows) runs AFTER the host starts so we don't

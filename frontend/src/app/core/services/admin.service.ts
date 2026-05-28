@@ -25,6 +25,16 @@ export interface AdminUser {
   lastLoginAt: string | null;
 }
 
+export interface CreateUserPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: 'Instructor' | 'Student' | 'Admin';
+  title?: string;
+  bio?: string;
+}
+
 export interface AdminCourse {
   id: string;
   title: string;
@@ -69,6 +79,9 @@ export class AdminService {
   }
   deleteUser(id: string): Observable<unknown> {
     return this.http.delete(`${this.base}/users/${id}`);
+  }
+  createUser(payload: CreateUserPayload): Observable<AdminUser> {
+    return this.http.post<AdminUser>(`${this.base}/users`, payload);
   }
 
   listCourses(opts: { search?: string; published?: boolean } = {}): Observable<AdminCourse[]> {
