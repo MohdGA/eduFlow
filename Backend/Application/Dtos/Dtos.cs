@@ -12,7 +12,8 @@ public sealed record RegisterRequest(
     [Required, MaxLength(40)]               string FirstName,
     [Required, MaxLength(40)]               string LastName,
     [Required, EmailAddress, MaxLength(120)] string Email,
-    [Required, MinLength(8), MaxLength(100)] string Password
+    [Required, MinLength(8), MaxLength(100)] string Password,
+    string Role = "Student"   // "Student" or "Instructor" only — Admin cannot self-register
 );
 
 public sealed record LoginRequest(
@@ -224,3 +225,13 @@ public sealed record UpdateUserRoleRequest(
 public sealed record UpdateUserStatusRequest(bool IsActive);
 
 public sealed record PublishCourseRequest(bool IsPublished);
+
+public sealed record CreateUserRequest(
+    [Required, MaxLength(40)]               string FirstName,
+    [Required, MaxLength(40)]               string LastName,
+    [Required, EmailAddress, MaxLength(120)] string Email,
+    [Required, MinLength(8), MaxLength(100)] string Password,
+    EduFlow.Domain.Entities.UserRole Role = EduFlow.Domain.Entities.UserRole.Instructor,
+    [MaxLength(140)]                        string? Title = null,
+    [MaxLength(1200)]                       string? Bio   = null
+);

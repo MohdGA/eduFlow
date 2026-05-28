@@ -35,13 +35,16 @@ public sealed class AuthService(
         var exists = await db.Users.AsNoTracking().AnyAsync(u => u.Email == normalizedEmail, ct);
         if (exists) return null;
 
+        // Only Student and Instructor may self-register; anything else defaults to Student.
+        var role = req.Role?.Trim() == "Instructor" ? UserRole.Instructor : UserRole.Student;
+
         var user = new User
         {
             FirstName    = req.FirstName.Trim(),
             LastName     = req.LastName.Trim(),
             Email        = normalizedEmail,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password, BCryptWorkFactor),
-            Role         = UserRole.Student,
+            Role         = role,
         };
 
         db.Users.Add(user);

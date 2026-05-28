@@ -18,6 +18,7 @@ export interface RegisterRequest {
   lastName:  string;
   email:     string;
   password:  string;
+  role?:     'Student' | 'Instructor';
 }
 
 export interface ApiError { code: string; message: string; }

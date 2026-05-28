@@ -28,7 +28,31 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
         </a>
 
         <h1 class="auth-title">Create your account</h1>
-        <p class="auth-sub">Start learning from expert instructors today.</p>
+        <p class="auth-sub">How will you use EduFlow?</p>
+
+        <!-- ── Role picker ── -->
+        <div class="role-picker">
+          <button type="button" class="role-card" [class.selected]="selectedRole === 'Student'" (click)="selectedRole = 'Student'">
+            <div class="rc-icon" style="background:linear-gradient(135deg,#7C3AED,#3B82F6)">
+              <mat-icon>school</mat-icon>
+            </div>
+            <div class="rc-body">
+              <p class="rc-title">I'm a Student</p>
+              <p class="rc-sub">Learn new skills from expert courses</p>
+            </div>
+            <div class="rc-check"><mat-icon>check_circle</mat-icon></div>
+          </button>
+          <button type="button" class="role-card" [class.selected]="selectedRole === 'Instructor'" (click)="selectedRole = 'Instructor'">
+            <div class="rc-icon" style="background:linear-gradient(135deg,#EC4899,#F87171)">
+              <mat-icon>co_present</mat-icon>
+            </div>
+            <div class="rc-body">
+              <p class="rc-title">I'm an Instructor</p>
+              <p class="rc-sub">Create and sell your own courses</p>
+            </div>
+            <div class="rc-check"><mat-icon>check_circle</mat-icon></div>
+          </button>
+        </div>
 
         <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" autocomplete="on">
           <div class="row-2">
@@ -91,8 +115,8 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
           }
 
           <button type="submit" class="submit-btn" [disabled]="form.invalid || loading()">
-            @if (loading()) { <mat-icon class="spin">progress_activity</mat-icon> } @else { <mat-icon>person_add</mat-icon> }
-            {{ loading() ? 'Creating account...' : 'Create Account' }}
+            @if (loading()) { <mat-icon class="spin">progress_activity</mat-icon> } @else { <mat-icon>{{ selectedRole === 'Instructor' ? 'co_present' : 'school' }}</mat-icon> }
+            {{ loading() ? 'Creating account...' : 'Join as ' + selectedRole }}
           </button>
 
           <p class="auth-foot">
@@ -152,6 +176,30 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
     .brand-name { font-size:18px; font-weight:800; letter-spacing:-.4px; }
     .auth-title { font-size:30px; font-weight:900; margin:0 0 8px; letter-spacing:-.6px; }
     .auth-sub   { font-size:14px; color:var(--lms-text-2); margin:0 0 24px; }
+
+    .role-picker { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .role-card {
+      display:flex; align-items:center; gap:14px;
+      padding:14px 16px; border-radius:var(--lms-radius-sm);
+      border:1.5px solid var(--lms-border); background:var(--lms-surface-2);
+      cursor:pointer; text-align:left; transition:all .2s; width:100%;
+      .rc-check { margin-left:auto; color:transparent; transition:color .2s;
+        mat-icon { font-size:20px; width:20px; height:20px; } }
+      &:hover { border-color:var(--lms-border-hover); }
+      &.selected {
+        border-color:var(--lms-purple);
+        background:var(--lms-purple-dim);
+        box-shadow:0 0 0 3px rgba(124,58,237,0.12);
+        .rc-check { color:var(--lms-purple-2); }
+      }
+    }
+    .rc-icon {
+      width:40px; height:40px; border-radius:10px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      mat-icon { color:#fff; font-size:20px; width:20px; height:20px; }
+    }
+    .rc-title { font-size:13.5px; font-weight:700; color:var(--lms-text); margin:0; }
+    .rc-sub   { font-size:11.5px; color:var(--lms-text-2); margin:2px 0 0; }
 
     .auth-form { display:flex; flex-direction:column; gap:8px; }
     .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -260,9 +308,10 @@ export class RegisterComponent {
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
 
-  loading  = signal(false);
-  showPw   = signal(false);
-  errorMsg = signal<string | null>(null);
+  loading      = signal(false);
+  showPw       = signal(false);
+  errorMsg     = signal<string | null>(null);
+  selectedRole: 'Student' | 'Instructor' = 'Student';
 
   onShowLegal(doc: 'Terms of Service' | 'Privacy Policy'): void {
     this.dialog.open(LegalDialogComponent, {
@@ -334,6 +383,7 @@ export class RegisterComponent {
       lastName:  v.lastName.trim(),
       email:     v.email.trim(),
       password:  v.password,
+      role:      this.selectedRole,
     }).subscribe({
       next: () => {
         this.loading.set(false);
