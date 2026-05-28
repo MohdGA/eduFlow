@@ -272,6 +272,15 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
       .auth-grid { grid-template-columns: 1fr; }
       .auth-right { display:none; }
     }
+    @media (max-width: 600px) {
+      .auth-page { padding:16px; align-items:flex-start; padding-top:24px; }
+      .auth-grid { padding:28px 20px; border-radius:16px; }
+      .auth-title { font-size:24px; }
+      .brand-link { margin-bottom:20px; }
+      .auth-sub { margin-bottom:16px; }
+      .form-row { flex-direction:column; align-items:flex-start; gap:8px; }
+      .oauth-row { grid-template-columns:1fr; }
+    }
   `]
 })
 export class LoginComponent {

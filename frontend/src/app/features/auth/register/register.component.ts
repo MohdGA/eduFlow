@@ -299,6 +299,16 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
       .auth-grid { grid-template-columns:1fr; }
       .auth-right { display:none; }
     }
+    @media (max-width: 600px) {
+      .auth-page { padding:16px; align-items:flex-start; padding-top:24px; }
+      .auth-grid { padding:28px 20px; border-radius:16px; }
+      .auth-title { font-size:24px; }
+      .auth-sub { margin-bottom:16px; }
+      .brand-link { margin-bottom:20px; }
+      .row-2 { grid-template-columns:1fr; }
+      .role-picker { gap:8px; margin-bottom:14px; }
+      .role-card { padding:12px 14px; }
+    }
   `]
 })
 export class RegisterComponent {
