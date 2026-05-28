@@ -307,6 +307,20 @@ import { AuthService } from '../core/services/auth.service';
 
     /* Content */
     .page-content { flex:1; overflow-y:auto; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1023px) {
+      .nav-links { display: none !important; }
+      .nav-inner { padding: 0 20px; }
+      .search-box { width: 180px; &:focus-within { width: 220px; } }
+    }
+    @media (max-width: 640px) {
+      .nav-inner { padding: 0 12px; gap: 6px; }
+      .brand-name { display: none; }
+      .search-box { width: 130px; &:focus-within { width: 170px; } }
+      .user-name, .user-chevron { display: none; }
+      .user-pill { padding: 4px 6px; }
+    }
   `]
 })
 export class ShellComponent {

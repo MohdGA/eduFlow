@@ -396,7 +396,25 @@ const initialFor = (name: string) => (name?.trim()?.[0]?.toUpperCase() ?? '?');
     .reviews-list { display:flex; flex-direction:column; gap:12px; }
     .review-item { display:flex; gap:14px; padding:20px; background:var(--lms-surface); border:1px solid var(--lms-border); border-radius:var(--lms-radius-sm); }
     .rev-av { width:40px; height:40px; border-radius:99px; background:var(--lms-gradient); color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .rev-body { flex:1; }
+    .rev-body { flex:1; min-width: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1023px) {
+      .cd-hero { padding: 28px 24px 40px; }
+      .cd-hero-inner { grid-template-columns: 1fr; gap: 24px; }
+      .enroll-card { position: static; }
+      .cd-body { padding: 0 24px; }
+      .cd-title { font-size: 28px; }
+    }
+    @media (max-width: 640px) {
+      .cd-hero { padding: 20px 14px 28px; }
+      .cd-body { padding: 0 14px; }
+      .cd-title { font-size: 22px; }
+      .cd-sub { font-size: 14px; }
+      .learn-grid { grid-template-columns: 1fr; }
+      .instr-card { flex-direction: column; gap: 16px; }
+      .reviews-summary { flex-direction: column; gap: 16px; }
+    }
     .rev-head { display:flex; align-items:center; gap:10px; margin-bottom:6px; font-size:13px;
       strong { color:var(--lms-text); }
       .rev-date { color:var(--lms-text-muted); font-size:12px; margin-left:auto; }

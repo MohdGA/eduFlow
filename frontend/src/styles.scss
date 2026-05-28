@@ -480,17 +480,31 @@ html, body {
   .a-grid { grid-template-columns: 1fr !important; }
 }
 
+/* SMALL TABLET — tighten padding before full mobile collapse. */
+@media (max-width: 768px) {
+  .page-wrap, .ins-wrap, .cur-wrap, .cd-wrap,
+  .mc-wrap, .catalog-wrap, .home-wrap, .admin-page, .adm-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  .hero-grid, .home-hero { grid-template-columns: 1fr !important; }
+  .stats-activity { grid-template-columns: 1fr !important; }
+  .achievement-row { grid-template-columns: 1fr !important; }
+  .continue-grid { grid-template-columns: 1fr !important; }
+  .course-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+}
+
 /* PHONE — single-column everything, larger tap targets, smaller type. */
 @media (max-width: 640px) {
   html, body { font-size: 14px; }
 
   /* Top app bar */
-  .shell-topbar, .adm-topbar {
+  .shell-topbar, .adm-topbar, .topnav {
     padding: 10px 12px !important;
     gap: 8px !important;
     flex-wrap: wrap;
   }
-  .shell-topbar .nav-links, .adm-nav-links { display: none !important; }
+  .shell-topbar .nav-links, .topnav .nav-links, .adm-nav-links { display: none !important; }
   .shell-search, .adm-search { width: 100% !important; order: 99; }
 
   /* Wrappers */

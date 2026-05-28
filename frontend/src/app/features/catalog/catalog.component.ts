@@ -270,8 +270,20 @@ const initialFor = (name: string) => (name?.trim()?.[0]?.toUpperCase() ?? '?');
     .grad-cyan   { background: linear-gradient(135deg,#164e63 0%,#06b6d4 100%); }
     .grad-green  { background: linear-gradient(135deg,#064e3b 0%,#10b981 100%); }
 
-    @media (max-width: 900px) {
-      .course-grid { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 1023px) {
+      .catalog-wrap { padding: 0 24px 48px; }
+      .cat-hero { padding: 40px 32px; }
+      .ch-title { font-size: 32px; }
+      .course-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .catalog-wrap { padding: 0 14px 32px; }
+      .cat-hero { padding: 28px 20px; margin: 16px 0; }
+      .ch-title { font-size: 24px; }
+      .ch-sub { font-size: 13px; }
+      .course-grid { grid-template-columns: 1fr; }
+      .filters { flex-direction: column; align-items: stretch; gap: 10px; }
+      .filter-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
     }
   `]
 })

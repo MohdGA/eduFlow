@@ -633,6 +633,41 @@ import { Hero3dComponent } from '../../shared/hero-3d.component';
     .grad-amber  { background: linear-gradient(135deg, #78350f 0%, #f59e0b 100%); }
     .grad-cyan   { background: linear-gradient(135deg, #164e63 0%, #06b6d4 100%); }
     .grad-green  { background: linear-gradient(135deg, #064e3b 0%, #10b981 100%); }
+
+    /* ── Responsive ── */
+    @media (max-width: 1023px) {
+      .home-wrap { padding: 0 24px 48px; }
+      .hero { padding: 40px 36px; min-height: 360px; }
+      .hero-3d-stage { width: 40%; }
+      .hero-h1 { font-size: 36px; }
+      .hero-stats-3d { grid-template-columns: repeat(3, 1fr); }
+      .continue-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-activity { grid-template-columns: 1fr; }
+      .achievement-row { grid-template-columns: 1fr; gap: 24px; padding: 28px; }
+      .medal-stage { height: 150px; }
+      .achievement-text h2 { font-size: 24px; }
+    }
+    @media (max-width: 768px) {
+      .hero { padding: 32px 24px; min-height: 260px; }
+      .hero-3d-stage { display: none; }
+      .hero-content { max-width: 100% !important; }
+      .hero-h1 { font-size: 30px; }
+      .hero-stats-3d { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .continue-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .home-wrap { padding: 0 14px 32px; }
+      .hero { padding: 24px 20px; margin: 12px 0 8px; }
+      .hero-h1 { font-size: 26px; }
+      .hero-stats-3d { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .flip-card { height: 110px; }
+      .fc-val { font-size: 24px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .achievement-row { padding: 18px; gap: 16px; }
+      .medal-stage { height: 120px; }
+      .achievement-text h2 { font-size: 20px; }
+      .streak-week { gap: 4px; flex-wrap: wrap; }
+    }
   `]
 })
 export class HomeComponent implements OnInit {
