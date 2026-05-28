@@ -36,7 +36,8 @@ public sealed class AuthService(
         if (exists) return null;
 
         // Only Student and Instructor may self-register; anything else defaults to Student.
-        var role = req.Role?.Trim() == "Instructor" ? UserRole.Instructor : UserRole.Student;
+        var role = string.Equals(req.Role?.Trim(), "Instructor", StringComparison.OrdinalIgnoreCase)
+            ? UserRole.Instructor : UserRole.Student;
 
         var user = new User
         {

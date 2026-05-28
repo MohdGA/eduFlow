@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using EduFlow.Domain.Entities;
 
 namespace EduFlow.Application.Dtos;
@@ -13,7 +14,7 @@ public sealed record RegisterRequest(
     [Required, MaxLength(40)]               string LastName,
     [Required, EmailAddress, MaxLength(120)] string Email,
     [Required, MinLength(8), MaxLength(100)] string Password,
-    string Role = "Student"   // "Student" or "Instructor" only — Admin cannot self-register
+    [property: JsonPropertyName("role")]    string? Role = null
 );
 
 public sealed record LoginRequest(
