@@ -134,7 +134,7 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
     .auth-page {
       min-height: 100vh;
       background: radial-gradient(circle at top right, #1A0E2E 0%, var(--lms-bg) 60%);
-      display: flex; flex-direction: column; align-items: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 32px; box-sizing: border-box; overflow-x: hidden;
     }
     .blob {
