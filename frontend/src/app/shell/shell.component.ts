@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -28,7 +28,7 @@ import { AuthService } from '../core/services/auth.service';
             <span class="brand-name">EduFlow</span>
           </a>
 
-          <!-- Nav links -->
+          <!-- Desktop nav links -->
           <div class="nav-links">
             @for (n of nav; track n.route) {
               <a class="nav-link" [routerLink]="n.route" routerLinkActive="active">
@@ -116,10 +116,61 @@ import { AuthService } from '../core/services/auth.service';
             } @else {
               <a routerLink="/login" class="sign-in-btn">Sign in</a>
             }
+
+            <!-- Hamburger — mobile only -->
+            <button class="hamburger" (click)="menuOpen.set(true)" aria-label="Open menu">
+              <mat-icon>menu</mat-icon>
+            </button>
           </div>
 
         </div>
       </nav>
+
+      <!-- ── Mobile drawer overlay ── -->
+      @if (menuOpen()) {
+        <div class="drawer-overlay" (click)="menuOpen.set(false)"></div>
+        <aside class="mobile-drawer">
+          <div class="drawer-head">
+            <div class="brand">
+              <div class="brand-icon"><mat-icon>school</mat-icon></div>
+              <span class="brand-name">EduFlow</span>
+            </div>
+            <button class="drawer-close" (click)="menuOpen.set(false)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          @if (auth.isLoggedIn()) {
+            <div class="drawer-user">
+              <div class="user-avatar lg">{{ initial() }}</div>
+              <div>
+                <div class="drawer-name">{{ fullName() }}</div>
+                <div class="drawer-email">{{ auth.currentUser()?.email }}</div>
+              </div>
+            </div>
+          }
+
+          <nav class="drawer-nav">
+            @for (n of nav; track n.route) {
+              <a class="drawer-link" [routerLink]="n.route" routerLinkActive="active"
+                 (click)="menuOpen.set(false)">
+                <mat-icon>{{ n.icon }}</mat-icon>
+                {{ n.label }}
+              </a>
+            }
+          </nav>
+
+          <div class="drawer-footer">
+            @if (auth.isLoggedIn()) {
+              <button class="drawer-signout" (click)="auth.logout(); menuOpen.set(false)">
+                <mat-icon>logout</mat-icon> Sign out
+              </button>
+            } @else {
+              <a routerLink="/login" class="sign-in-btn" (click)="menuOpen.set(false)">Sign in</a>
+            }
+          </div>
+        </aside>
+      }
 
       <!-- ── Content ── -->
       <main class="page-content">
@@ -308,16 +359,100 @@ import { AuthService } from '../core/services/auth.service';
     /* Content */
     .page-content { flex:1; overflow-y:auto; }
 
+    /* ── Hamburger (hidden on desktop) ── */
+    .hamburger {
+      display: none;
+      width: 38px; height: 38px; border-radius: var(--lms-radius-sm);
+      border: 1px solid var(--lms-border);
+      background: var(--lms-surface); color: var(--lms-text-2);
+      align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s; flex-shrink: 0;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      &:hover { border-color: var(--lms-border-hover); color: var(--lms-text); background: var(--lms-surface-2); }
+    }
+
+    /* ── Mobile drawer ── */
+    .drawer-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+      animation: fadeIn .2s ease;
+    }
+    .mobile-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+      width: 280px;
+      background: var(--lms-surface);
+      border-left: 1px solid var(--lms-border);
+      display: flex; flex-direction: column;
+      animation: slideFromRight .25s cubic-bezier(.16,1,.3,1);
+      overflow-y: auto;
+    }
+    @keyframes slideFromRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+
+    .drawer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px; border-bottom: 1px solid var(--lms-border); flex-shrink: 0;
+      .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    }
+    .drawer-close {
+      width: 34px; height: 34px; border-radius: var(--lms-radius-sm);
+      border: 1px solid var(--lms-border); background: transparent;
+      color: var(--lms-text-2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+      &:hover { background: var(--lms-surface-2); color: var(--lms-text); }
+    }
+
+    .drawer-user {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 18px; border-bottom: 1px solid var(--lms-border);
+      .user-avatar.lg { width: 40px; height: 40px; font-size: 16px; flex-shrink: 0; }
+    }
+    .drawer-name  { font-size: 14px; font-weight: 700; color: var(--lms-text); }
+    .drawer-email { font-size: 12px; color: var(--lms-text-2); margin-top: 2px; }
+
+    .drawer-nav {
+      display: flex; flex-direction: column; padding: 10px 10px; flex: 1;
+    }
+    .drawer-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: var(--lms-radius-sm);
+      font-size: 14px; font-weight: 500; color: var(--lms-text-2);
+      text-decoration: none; transition: all .15s;
+      mat-icon { font-size: 20px; width: 20px; height: 20px; }
+      &:hover { color: var(--lms-text); background: var(--lms-surface-2); }
+      &.active {
+        color: var(--lms-text); background: var(--lms-purple-dim); font-weight: 700;
+        mat-icon { color: var(--lms-purple-2); }
+      }
+    }
+
+    .drawer-footer {
+      padding: 14px 18px; border-top: 1px solid var(--lms-border); flex-shrink: 0;
+      .sign-in-btn { display: block; text-align: center; }
+    }
+    .drawer-signout {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 11px 14px; border-radius: var(--lms-radius-sm);
+      border: 1px solid var(--lms-border); background: transparent;
+      color: var(--lms-red); font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+      &:hover { background: var(--lms-red-dim); }
+    }
+
     /* ── Responsive ── */
     @media (max-width: 1023px) {
-      .nav-links { display: none !important; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
       .nav-inner { padding: 0 20px; }
       .search-box { width: 180px; &:focus-within { width: 220px; } }
     }
     @media (max-width: 640px) {
       .nav-inner { padding: 0 12px; gap: 6px; }
       .brand-name { display: none; }
-      .search-box { width: 130px; &:focus-within { width: 170px; } }
+      .search-box { width: 120px; &:focus-within { width: 160px; } }
       .user-name, .user-chevron { display: none; }
       .user-pill { padding: 4px 6px; }
     }
@@ -329,6 +464,10 @@ export class ShellComponent {
   private readonly router = inject(Router);
 
   searchTerm = '';
+  menuOpen   = signal(false);
+
+  @HostListener('document:keydown.escape')
+  closeMenu() { this.menuOpen.set(false); }
 
   notifications = signal([
     { id: 1, icon: 'school',  color: 'purple', title: 'New course recommended',  body: 'Next.js 15 — Production Patterns', time: '5m ago', read: false },
