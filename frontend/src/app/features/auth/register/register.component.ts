@@ -149,10 +149,11 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
   styles: [`
     :host { display: block; }
     .auth-page {
-      position: fixed; inset: 0;
-      overflow-y: auto; overflow-x: hidden;
+      min-height: 100vh;
       background: radial-gradient(circle at bottom left, #1A0E2E 0%, var(--lms-bg) 60%);
-      display: flex; padding: 32px; box-sizing: border-box;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; box-sizing: border-box; overflow-x: hidden;
     }
     .blob {
       &.b1 { width:520px; height:520px; background:rgba(124,58,237,0.18); top:-150px; right:-100px; }
@@ -160,7 +161,7 @@ import { LegalDialogComponent } from '../../../shared/legal-dialog.component';
       &.b3 { width:300px; height:300px; background:rgba(236,72,153,0.10); top:50%; right:40%; }
     }
     .auth-grid {
-      position: relative; z-index: 1; margin: auto;
+      position: relative; z-index: 1;
       width: 100%; max-width: 1080px;
       display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
       background: rgba(17,17,32,0.6); backdrop-filter: blur(20px);

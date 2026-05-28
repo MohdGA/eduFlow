@@ -132,10 +132,11 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
     /* ── Page shell: fixed viewport, scrolls internally ── */
     :host { display: block; }
     .auth-page {
-      position: fixed; inset: 0;
-      overflow-y: auto; overflow-x: hidden;
+      min-height: 100vh;
       background: radial-gradient(circle at top right, #1A0E2E 0%, var(--lms-bg) 60%);
-      display: flex; padding: 32px; box-sizing: border-box;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px; box-sizing: border-box; overflow-x: hidden;
     }
     .blob {
       &.b1 { width:520px; height:520px; background:rgba(124,58,237,0.18); top:-150px; left:-100px; }
@@ -145,7 +146,7 @@ import { ResetPasswordDialogComponent } from '../reset-password-dialog.component
 
     /* ── Card ── */
     .auth-grid {
-      position: relative; z-index: 1; margin: auto;
+      position: relative; z-index: 1;
       width: 100%; max-width: 1080px;
       display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
       background: rgba(17,17,32,0.6); backdrop-filter: blur(20px);

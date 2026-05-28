@@ -262,7 +262,7 @@ body.light-mode {
 /* ── Base ── */
 *, *::before, *::after { box-sizing: border-box; }
 html, body {
-  height: 100%; margin: 0;
+  margin: 0;
   @include mat.theme((
     color: (primary: mat.$violet-palette, tertiary: mat.$blue-palette),
     typography: Roboto,
