@@ -92,6 +92,10 @@ export class CourseService {
     return this.http.patch<CourseSummary>(`${API_BASE_URL}/Courses/${id}`, payload);
   }
 
+  togglePublish(id: string): Observable<CourseSummary> {
+    return this.http.patch<CourseSummary>(`${API_BASE_URL}/Courses/${id}/publish`, {});
+  }
+
   /** Upload a thumbnail image for a course. Image goes to /media/courses/<id>.<ext>. */
   uploadThumbnail(courseId: string, file: File): Observable<CourseSummary> {
     const fd = new FormData();

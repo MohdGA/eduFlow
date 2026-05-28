@@ -289,6 +289,42 @@ public sealed class CoursesController(AppDbContext db) : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>Toggle published/draft state. Admin only.</summary>
+    [HttpPatch("{id:guid}/publish")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(CourseSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> TogglePublish(Guid id, CancellationToken ct)
+    {
+        var course = await db.Courses.Include(c => c.Instructor)
+            .Include(c => c.Sections).ThenInclude(s => s.Lessons)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+        if (course is null) return NotFound();
+
+        course.IsPublished = !course.IsPublished;
+        course.UpdatedAt   = DateTime.UtcNow;
+
+        db.AuditLogs.Add(new AuditLog
+        {
+            UserId    = GetUserId(),
+            Action    = course.IsPublished ? "COURSE_PUBLISH" : "COURSE_UNPUBLISH",
+            Resource  = "Course",
+            Detail    = $"'{course.Title}' is now {(course.IsPublished ? "published" : "draft")}",
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+        });
+        await db.SaveChangesAsync(ct);
+
+        var dto = new CourseSummaryDto(course.Id, course.Title, course.Subtitle, course.Category,
+            course.Level.ToString(), course.Price,
+            course.Instructor != null ? course.Instructor.FirstName + " " + course.Instructor.LastName : "Unknown",
+            course.Instructor?.AvatarSeed ?? "?",
+            course.Sections.SelectMany(s => s.Lessons).Count(),
+            course.Duration, course.Rating, course.ReviewCount, course.StudentCount,
+            course.IsBestseller, course.IsNew, course.ThumbnailGradient,
+            course.IsPublished, course.ImageUrl);
+        return Ok(dto);
+    }
+
     private Guid? GetUserId()
     {
         var sub = User.FindFirstValue("sub") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
