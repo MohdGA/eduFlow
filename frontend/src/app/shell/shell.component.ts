@@ -522,12 +522,18 @@ export class ShellComponent {
     this.router.navigate(['/my-courses']);
   }
 
-  nav = [
-    { label:'Home',       icon:'home',          route:'/home' },
-    { label:'Journey',    icon:'auto_awesome',   route:'/journey' },
-    { label:'Catalog',    icon:'menu_book',      route:'/catalog' },
-    { label:'My Courses', icon:'play_lesson',    route:'/my-courses' },
-    { label:'Instructor', icon:'co_present',     route:'/instructor' },
-    { label:'Admin',      icon:'admin_panel_settings', route:'/admin' },
-  ];
+  get nav() {
+    const isInstructor = this.auth.hasRole('Instructor');
+    const isAdmin      = this.auth.hasRole('Admin');
+    return [
+      { label:'Home',       icon:'home',               route:'/home' },
+      { label:'Journey',    icon:'auto_awesome',        route:'/journey' },
+      { label:'Catalog',    icon:'menu_book',           route:'/catalog' },
+      { label:'My Courses', icon:'play_lesson',         route:'/my-courses' },
+      ...(isInstructor || isAdmin
+        ? [{ label:'Instructor', icon:'co_present',          route:'/instructor' }] : []),
+      ...(isAdmin
+        ? [{ label:'Admin',      icon:'admin_panel_settings', route:'/admin' }] : []),
+    ];
+  }
 }
